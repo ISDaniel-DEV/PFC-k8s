@@ -1,0 +1,51 @@
+version: '3.9'
+
+services:
+
+  nodejs:
+    build: ./nodejs-app
+    container_name: nodejs-app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./nodejs-app:/app
+
+  mysql:
+    image: mysql:8
+    container_name: mysql-ddbb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: pfc-bbdd
+      MYSQL_USER: pfcuser
+      MYSQL_PASSWORD: abc123
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build: ./springboot-app
+    container_name: springboot-app
+    ports:
+      - "8888:8888"
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-ddbb:3306/pfc-bbdd
+      SPRING_DATASOURCE_USERNAME: pfcuser
+      SPRING_DATASOURCE_PASSWORD: abc123
+
+  frontend:
+    build: ./frontend-app
+    container_name: frontend-app
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend-app/dist:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:

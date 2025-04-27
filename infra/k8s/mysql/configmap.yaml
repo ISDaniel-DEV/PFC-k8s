@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-initdb-config
+data:
+  init.sql: |
+    SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+    START TRANSACTION;
+    SET time_zone = "+00:00";
+
+    CREATE TABLE `publicacion` (
+      `id` int(10) NOT NULL,
+      `id_autor` int(10) NOT NULL,
+      `nombre` varchar(200) NOT NULL,
+      `titulo` varchar(200) NOT NULL,
+      `descripcion` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`descripcion`)),
+      `archivo` varchar(200) NOT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+    CREATE TABLE `usuario` (
+      `id` int(10) NOT NULL,
+      `nombre` varchar(30) NOT NULL,
+      `email` varchar(50) NOT NULL,
+      `password` varchar(20) NOT NULL,
+      `NPublicaciones` int(10) NOT NULL,
+      `foto_perfil` varchar(1000) NOT NULL,
+      `foto_banner` varchar(1000) NOT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+    INSERT INTO `usuario` (`id`, `nombre`, `email`, `password`, `NPublicaciones`, `foto_perfil`, `foto_banner`) VALUES
+    (1, 'Isaac', 'sdaniel9391@gmail.com', 'abc123', 1, '', ''),
+    (2, 'Pandorito', 'leandroutz@gmail.com', 'Abc123', 0, './img/perfil/perfil_default.png', './img/perfil/banner_default.png');
+
+    ALTER TABLE `publicacion`
+      ADD PRIMARY KEY (`id`);
+    
+    ALTER TABLE `usuario`
+      ADD PRIMARY KEY (`id`);
+    
+    ALTER TABLE `publicacion`
+      MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+    
+    ALTER TABLE `usuario`
+      MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+    
+    COMMIT;

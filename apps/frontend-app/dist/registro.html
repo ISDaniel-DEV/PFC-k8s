@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogIn</title>
+    <link rel="stylesheet" href="./styles/registro.css">
+</head>
+<div class="muros" id="muro2" style="display: none;">
+</div>
+<div class="muros" id="muro1" style="display: none;">
+</div>
+
+<body>
+    <div class="registrado" id="registrado">
+        <div>
+            <p>Se ha registrado correctamente</p><img src="./img/animated-green-verified-check-mark-k3et2jz52jyu2v22-2360956222.gif" width="50px" alt="">
+        </div>
+    </div>
+    <main>
+
+        <h1>Bienvenido a</h1>
+
+        <h1>DESIGBAY</h1>
+
+        <p>Comparte tu estilo con la comunidad</p>
+
+        <img src="./img/barra de diseños.png" alt="">
+
+        <p>Encuentra y descargar los diseños que se adapten mejor a tus ideas y proyectos</p>
+
+        <button id="volver">Explorar</button>
+
+        <button id="irlogin">Ir al registro</button>
+
+    </main>
+    <div>
+        <main class="registrarse">
+
+            <h1>Registrarse</h1>
+
+            <section>
+                <p class="estilo" id="errGeneral"></p>
+                <label for="name">Nombre de Usuario</label>
+                <input type="text" name="name" placeholder="Example" id="nombre">
+                <p class="estilo" id="errNombre"></p>
+            </section>
+
+            <section>
+                <label for="mail">Email</label>
+                <input type="mail" name="mail" placeholder="Ejemplo123@ejemplo.com" id="email">
+                <p class="estilo" id="errEmail"></p>
+            </section>
+
+            <section>
+                <label for="password">Contraseña</label>
+                <input type="password" name="password" placeholder="Contraseña" id="password">
+                <p class="estilo" id="errPassword"></p>
+            </section>
+
+            <section>
+                <label for="repassword">Repetir Contraseña</label>
+                <input type="password" name="password" placeholder="Repetir Contraseña" id="repassword">
+                <p class="estilo" id="errRepassword"></p>
+            </section>
+
+            <button id="registrar">Registrarse</button>
+            <p>¿Ya estas registrado? <a href="login">Inicia sesion</a></p>
+
+        </main>
+    </div>
+    <script src="./js/acceder.js"></script>
+    <script src="./js/registro.js"></script>
+</body>
+
+</html>

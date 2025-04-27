@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-initdb-config
+data:
+  init.sql: |
+    -- Aquí pones el contenido de tu init.sql
+    CREATE DATABASE IF NOT EXISTS `pfc-bbdd`;
+    CREATE USER 'pfcuser'@'%' IDENTIFIED BY 'abc123';
+    GRANT ALL PRIVILEGES ON `pfc-bbdd`.* TO 'pfcuser'@'%';
+    FLUSH PRIVILEGES;

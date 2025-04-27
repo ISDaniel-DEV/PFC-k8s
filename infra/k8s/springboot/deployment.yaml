@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: springboot-app
+  template:
+    metadata:
+      labels:
+        app: springboot-app
+    spec:
+      containers:
+        - name: springboot
+          image: springboot-app:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8888
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://mysql:3306/pfc-bbdd
+            - name: SPRING_DATASOURCE_USERNAME
+              value: pfcuser
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: abc123

@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+    - host: pfc.local
+      http:
+        paths:
+          - path: /?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
+          - path: /api/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: springboot-service
+                port:
+                  number: 8888
+          - path: /node/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: nodejs-service
+                port:
+                  number: 3000
