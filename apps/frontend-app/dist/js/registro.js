@@ -10,7 +10,7 @@ let errRepassword = document.getElementById('errRepassword');
 async function createUser(userData) {
     try {
         const response = await 
-        fetch('/api/registro', {
+        fetch('/api/api/registro', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

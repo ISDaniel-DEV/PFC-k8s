@@ -36,7 +36,7 @@ if (id == localStorage.getItem("idLogeado")) {
 
 function nuevoSeguidor(id, idSeguidor) {
 
-    fetch(`http://localhost:3000/nuevoSeguidor/${id}/${idSeguidor}`, {
+    fetch(`node/nuevoSeguidor/${id}/${idSeguidor}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json', // If you were sending JSON in the body.
@@ -60,7 +60,7 @@ function nuevoSeguidor(id, idSeguidor) {
 
 }
 
-fetch(`http://localhost:3000/cantidadSeguidores/${id}`, {
+fetch(`node/cantidadSeguidores/${id}`, {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json', // If you were sending JSON in the body.

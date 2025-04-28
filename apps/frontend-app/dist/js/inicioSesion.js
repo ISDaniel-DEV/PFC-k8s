@@ -12,7 +12,7 @@ boton.addEventListener('click', function () {
     console.log(email.value);
     console.log(password.value);
 
-    let url1 = "http://localhost:8888/api/UsuarioEmail?dato=" + email.value + "";
+    let url1 = "/api/api/UsuarioEmail?dato=" + email.value + "";
     fetch(url1, {
         method: "GET",
         headers: {
@@ -39,7 +39,7 @@ boton.addEventListener('click', function () {
                 let error = document.getElementById('error');
                 error.textContent = "";
 
-                let url1 = "http://localhost:8888/api/UsuarioEmail?dato=" + email.value + "";
+                let url1 = "api/api/UsuarioEmail?dato=" + email.value + "";
 
                 console.log("funciono");
                 localStorage.setItem("idLogeado", parseado.id);

@@ -82,7 +82,7 @@ if(!logeado1){
 
 function crearJSON(id, tipo) {
 
-    fetch(`http://localhost:3000/crearJSON/${id}/${tipo}`, {
+    fetch(`node/crearJSON/${id}/${tipo}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json', // If you were sending JSON in the body.
