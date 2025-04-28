@@ -128,6 +128,7 @@ main h1 {
 }
 
 main section {
+    position:relative;
     display: flex;
     flex-direction: column;
     margin: 10px;
@@ -196,15 +197,55 @@ body main button:nth-of-type(2) {
     display: none;
 }
 
+.posicion{
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    right: -223px;
+    top: 25px;
+    width: 200px;
+    height: 35px;
+}
+
 .estilo {
+    visibility: visible;
+    opacity: 1;
+    position: absolute;
+    right: -223px;
+    top: 25px;
+    width: 200px;
+    height: 35px;
+
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #ffffff;
-    padding: 0px 8px;
+    padding: 2px 8px;
     margin: 2px;
     margin-bottom: 0;
-    background-color: #ff0000c9;
+    color: black;
+    background-color: #ffceced2;
+    border: 1px solid #ff0000c9;
     border-radius: 5px;
     font-size: 12px;
+    animation: fadeIn 5s forwards ease-in-out;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    10%{
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+.error{
+    border: 1px solid #ff0000c9;
 }
 
 .registrado {
