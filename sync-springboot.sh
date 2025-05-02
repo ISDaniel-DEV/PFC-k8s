@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Replace with your real pod name
-POD_NAME="springboot-app-5fcbcdf985-fbtxp"
+POD_NAME="springboot-app-5fcbcdf985-bk6vt"
 
 # Path to your local built JAR
 LOCAL_JAR="./apps/springboot-app/target/springboot-app-0.0.1-SNAPSHOT.jar"
