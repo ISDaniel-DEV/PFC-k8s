@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class UsuarioServiceImpl implements UsuarioService{
+public class UsuarioServiceImpl implements UsuarioService {
 
     private static final Logger log = LoggerFactory.getLogger(UsuarioServiceImpl.class);
 
@@ -22,10 +22,10 @@ public class UsuarioServiceImpl implements UsuarioService{
                 usuarioDTO.getId());
 
         Optional<Usuario> usuario = usuarioRepository.findById(usuarioDTO.getId());
-        if(usuario.isPresent()) {
+        if (usuario.isPresent()) {
             usuarioDTO = UsuarioDTO.convertToDTO(usuario.get());
             return usuarioDTO;
-        }else {
+        } else {
             return null;
         }
     }
@@ -36,11 +36,11 @@ public class UsuarioServiceImpl implements UsuarioService{
                 usuarioDTO.getEmail());
 
         Optional<Usuario> usuario = usuarioRepository.findUsuario(usuarioDTO.getEmail());
-        if(usuario.isPresent()) {
+        if (usuario.isPresent()) {
             usuarioDTO = UsuarioDTO.convertToDTO(usuario.get());
             log.info(String.valueOf(usuarioDTO));
             return usuarioDTO;
-        }else {
+        } else {
             return null;
         }
     }
@@ -54,20 +54,21 @@ public class UsuarioServiceImpl implements UsuarioService{
         usuarioRepository.save(usuario);
     }
 
-    /* 
-    @Override
-    public List<UsuarioDTO> findByDep(UsuarioDTO usuarioDTO) {
-        log.info("ClienteServiceImpl - findById: Buscar cliente por id: " +
-                usuarioDTO.getId());
-
-        List<UsuarioDTO> listaUsuarioDTO = usuarioRepository.findDep(usuarioDTO.getIdDepart())
-                .stream()
-                .map(p -> UsuarioDTO.convertToDTO(p))
-                .collect(Collectors.toList());
-
-        return listaUsuarioDTO;
-
-    }
-    */
+    /*
+     * @Override
+     * public List<UsuarioDTO> findByDep(UsuarioDTO usuarioDTO) {
+     * log.info("ClienteServiceImpl - findById: Buscar cliente por id: " +
+     * usuarioDTO.getId());
+     * 
+     * List<UsuarioDTO> listaUsuarioDTO =
+     * usuarioRepository.findDep(usuarioDTO.getIdDepart())
+     * .stream()
+     * .map(p -> UsuarioDTO.convertToDTO(p))
+     * .collect(Collectors.toList());
+     * 
+     * return listaUsuarioDTO;
+     * 
+     * }
+     */
 
 }

@@ -21,6 +21,7 @@ boton.addEventListener('click', function () {
     })
         .then(response => response.text())
         .then(data => {
+            console.log(data)
             let parseado = JSON.parse(data);
             if (data == "") {
                 console.log(data);

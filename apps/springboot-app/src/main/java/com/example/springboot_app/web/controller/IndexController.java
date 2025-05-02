@@ -21,11 +21,17 @@ public class IndexController {
 
     @GetMapping("/api/UsuarioEmail")
     public UsuarioDTO ByEmail (@RequestParam String dato){
-        log.info(dato);
-        UsuarioDTO usuarioDTO=new UsuarioDTO();
-        usuarioDTO.setEmail(dato);
-        log.info(String.valueOf(usuarioDTO));
-        return usuarioService.findByEmail(usuarioDTO);
+        if(dato == null || dato.isEmpty()) {
+            log.error("El dato no puede ser nulo o vacío");
+            return null;
+        }else{
+            log.info(dato);
+            UsuarioDTO usuarioDTO=new UsuarioDTO();
+            usuarioDTO.setEmail(dato);
+            log.info(String.valueOf(usuarioDTO));
+            return usuarioService.findByEmail(usuarioDTO);
+        }
+    
     }
 
 }

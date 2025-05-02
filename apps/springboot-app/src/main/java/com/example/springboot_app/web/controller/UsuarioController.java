@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -21,13 +22,29 @@ public class UsuarioController {
     
     @PostMapping("/api/registro")
     public UsuarioDTO save(@RequestBody UsuarioDTO usuarioDTO) {
-        log.info("UsuarioRestController - save: Guardar usuario: " +
-                usuarioDTO.toString());
+        log.info("UsuarioRestController - save: Guardar usuario: " + usuarioDTO.toString());
+        
+        log.info("datos del usuario registrado" + usuarioDTO);
 
-        usuarioService.save(usuarioDTO);
-        return usuarioDTO;
+        UsuarioDTO existente = usuarioService.findByEmail(usuarioDTO);
+        log.info("Resultado de findByEmail: " + existente);
+
+        if(existente != null){
+            log.error("El email ya existe");
+            UsuarioDTO.updateUsuarioDTO(usuarioDTO, "", "Email ya existente", "",0, "","");
+            return usuarioDTO;
+        }else{
+            log.info("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa pene" + usuarioDTO);
+            usuarioService.save(usuarioDTO);
+            log.info("Usuario registrado correctamente: " + usuarioDTO);
+            return usuarioDTO;
+        }
     }
 
+
+   
+
+            
     
 
 

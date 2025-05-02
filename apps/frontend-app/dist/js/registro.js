@@ -147,11 +147,11 @@ registrar.addEventListener('click', function () {
         createUser(newUser);
         console.log(nombre, email, password, repassword);
         registrado.style.display = "flex";
-
+/*
         setTimeout(() => {
             window.location.href = "./login";
         }, 2000);
-
+*/
     }
 });
 
@@ -172,8 +172,10 @@ async function createUser(userData) {
 
         const data = await response.json();
         console.log('User created successfully:', data);
+        console.log(data);
     } catch (error) {
         console.error('There was a problem with the fetch operation:', error);
+        console.log(data);
     }
 }
 

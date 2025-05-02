@@ -44,4 +44,13 @@ public class UsuarioDTO {
 
         return usuarioDTO;
     }
+
+    public static void updateUsuarioDTO(UsuarioDTO usuarioDTO, String nombre, String email, String password, int NPublicaciones, String foto_perfil, String foto_banner) {
+        usuarioDTO.setNombre(nombre);
+        usuarioDTO.setEmail(email);
+        usuarioDTO.setPassword(password);
+        usuarioDTO.setNPublicaciones(NPublicaciones);
+        usuarioDTO.setFoto_perfil(foto_perfil);
+        usuarioDTO.setFoto_banner(foto_banner);
+    }
 }

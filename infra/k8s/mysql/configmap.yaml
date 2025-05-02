@@ -43,4 +43,7 @@ data:
     ALTER TABLE `usuario`
       MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
     
+    INSERT INTO `publicacion` (`id`, `id_autor`, `nombre`, `titulo`, `descripcion`, `archivo`) VALUES
+      (1, 27, 'Pagina azul', 'Pagina azul', 'Pagina azul porque me encanta el azul, azul de mar azul de cielo, azul de pureza. UWU', 'a');
+    
     COMMIT;
