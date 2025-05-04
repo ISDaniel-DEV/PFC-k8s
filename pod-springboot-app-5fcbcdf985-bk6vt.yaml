@@ -1,0 +1,131 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kubectl.kubernetes.io/restartedAt: "2025-04-27T17:16:26+02:00"
+  creationTimestamp: "2025-05-02T10:14:50Z"
+  generateName: springboot-app-5fcbcdf985-
+  labels:
+    app: springboot-app
+    pod-template-hash: 5fcbcdf985
+  name: springboot-app-5fcbcdf985-bk6vt
+  namespace: default
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ReplicaSet
+    name: springboot-app-5fcbcdf985
+    uid: cb812a77-39bf-4b41-81e4-1e0ac265edf5
+  resourceVersion: "216104"
+  uid: cdaf1ae4-4ee8-4d28-bb71-bc7be17d6fcd
+spec:
+  containers:
+  - env:
+    - name: SPRING_DATASOURCE_URL
+      value: jdbc:mysql://mysql:3306/pfc-bbdd
+    - name: SPRING_DATASOURCE_USERNAME
+      value: pfcuser
+    - name: SPRING_DATASOURCE_PASSWORD
+      value: abc123
+    image: springboot-app:latest
+    imagePullPolicy: Never
+    name: springboot
+    ports:
+    - containerPort: 8888
+      protocol: TCP
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-rqzmd
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: minikube
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: kube-api-access-rqzmd
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2025-05-02T10:14:53Z"
+    status: "True"
+    type: PodReadyToStartContainers
+  - lastProbeTime: null
+    lastTransitionTime: "2025-05-02T10:14:50Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2025-05-02T14:47:46Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2025-05-02T14:47:46Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2025-05-02T10:14:50Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: docker://1f8caf7884fd8f12447522eba72e5e960fedfea5e908b55d1a6f2f586e4df510
+    image: springboot-app:latest
+    imageID: docker://sha256:dea8272e8844cc37354979148a7805cf1650c46a317ac0fdf78be2ac1aa71a3a
+    lastState:
+      terminated:
+        containerID: docker://a882faf667a4fe6ab17a1f48abfd54912d1d4f05cf9592116008356b604c328e
+        exitCode: 143
+        finishedAt: "2025-05-02T14:47:45Z"
+        reason: Error
+        startedAt: "2025-05-02T10:16:43Z"
+    name: springboot
+    ready: true
+    restartCount: 2
+    started: true
+    state:
+      running:
+        startedAt: "2025-05-02T14:47:46Z"
+  hostIP: 192.168.49.2
+  hostIPs:
+  - ip: 192.168.49.2
+  phase: Running
+  podIP: 10.244.0.58
+  podIPs:
+  - ip: 10.244.0.58
+  qosClass: BestEffort
+  startTime: "2025-05-02T10:14:50Z"

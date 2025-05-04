@@ -1,12 +1,14 @@
 let numero = 0;
 
-async function bajarNumero(){
+async function bajarNumero() {
     setTimeout(function () {
         numero = 0;
-    }, 7000);
+    }, 1000);
 }
 
-registrar.addEventListener('click', function () {
+let resultado;
+
+registrar.addEventListener('click', async function () {
     let validador = true;
 
     let nombreElem = document.getElementById('nombre');
@@ -28,11 +30,7 @@ registrar.addEventListener('click', function () {
     let errPassword = document.getElementById('errPassword');
     let errRepassword = document.getElementById('errRepassword');
 
-    errNombre.textContent = "";
-    errEmail.textContent = "";
-    errPassword.textContent = "";
-    errRepassword.textContent = "";
-
+    
 
     // Nombre
     if (nombre.trim() === "") {
@@ -60,26 +58,32 @@ registrar.addEventListener('click', function () {
 
     if (email.trim() === "") {
         validador = false;
-    } else
-        if (email.length < 3 && email.length > 0) {
-            errEmail.textContent = "Email no valido";
-            validador = false;
+    }
+    else if (email.length < 3 && email.length > 0) {
+        errEmail.textContent = "Email no valido";
+        validador = false;
 
-            errEmail.classList.add("estilo");
-            emailElem.classList.add("error");
-        } else if (email.indexOf("@") == -1 && email.length > 0) {
-            errEmail.textContent = "Email no valido";
-            validador = false;
+        errEmail.classList.remove("estilo");
+        void errEmail.offsetWidth;
+        errEmail.classList.add("estilo");
+        emailElem.classList.add("error");
+    } else if (email.indexOf("@") == -1 && email.length > 0) {
+        errEmail.textContent = "Email no valido";
+        validador = false;
 
-            errEmail.classList.add("estilo");
-            emailElem.classList.add("error");
-        } else if (email.indexOf(".") == -1 && email.length > 0) {
-            errEmail.textContent = "Email no valido";
-            validador = false;
+        errEmail.classList.remove("estilo");
+        void errEmail.offsetWidth;
+        errEmail.classList.add("estilo");
+        emailElem.classList.add("error");
+    } else if (email.indexOf(".") == -1 && email.length > 0) {
+        errEmail.textContent = "Email no valido";
+        validador = false;
 
-            errEmail.classList.add("estilo");
-            emailElem.classList.add("error");
-        }
+        errEmail.classList.remove("estilo");
+        void errEmail.offsetWidth;
+        errEmail.classList.add("estilo");
+        emailElem.classList.add("error");
+    }
 
     // Password
     if (password.trim() === "") {
@@ -89,46 +93,48 @@ registrar.addEventListener('click', function () {
         validador = false;
         errPassword.textContent = "Contraseña muy corta (mínimo 6 caracteres)";
 
+        errPassword.classList.remove("estilo");
+        void errPassword.offsetWidth;
         errPassword.classList.add("estilo");
         passwordElem.classList.add("error");
     } else if (password.length > 20) {
         validador = false;
         errPassword.textContent = "Contraseña muy larga (máximo 20 caracteres)";
 
+        errPassword.classList.remove("estilo");
+        void errPassword.offsetWidth;
         errPassword.classList.add("estilo");
         passwordElem.classList.add("error");
     } else if (!passwordRegex.test(password) && password.length > 0) {
         validador = false;
         errPassword.textContent = "Minimo 1 mayúscula, 1 minúscula y 1 número";
 
+        errPassword.classList.remove("estilo");
+        void errPassword.offsetWidth;        
         errPassword.classList.add("estilo");
         passwordElem.classList.add("error");
     } else if (password != repassword && password.length > 0) {
         validador = false;
         errRepassword.textContent = "Las contraseñas no coinciden";
 
+        errRepassword.classList.remove("estilo");
+        void errRepassword.offsetWidth;
         errRepassword.classList.add("estilo");
         repasswordElem.classList.add("error");
     }
 
 
-    if(numero = 0){
+    if (numero = 0) {
         setTimeout(function () {
             errNombre.textContent = "";
             errEmail.textContent = "";
             errPassword.textContent = "";
             errRepassword.textContent = "";
         }, 7000);
-    
+
         setTimeout(function () {
-            errNombre.classList.remove("estilo");
-            errEmail.classList.remove("estilo");
-            errPassword.classList.remove("estilo");
-            errRepassword.classList.remove("estilo");
-            nombreElem.classList.remove("error");
-            emailElem.classList.remove("error");
-            passwordElem.classList.remove("error");
-            repasswordElem.classList.remove("error");
+            [errNombre, errEmail, errPassword, errRepassword].forEach(errElem => errElem.classList.remove("estilo"));
+            [nombreElem, emailElem, passwordElem, repasswordElem].forEach(inputElem => inputElem.classList.remove("error"));
         }, 7000);
         numero = 1
     }
@@ -144,38 +150,56 @@ registrar.addEventListener('click', function () {
     };
 
     if (validador == true) {
-        createUser(newUser);
+        resultado = await createUser(newUser);
+        console.log("segunda vez" + resultado);
+        if (resultado == false) {
+
+            errEmail.classList.remove("estilo");
+            void errEmail.offsetWidth;
+            errEmail.textContent = "Email ya registrado";
+            errEmail.classList.add("estilo");
+            emailElem.classList.add("error");
+
+            validador = false;
+
+        } else {
+            
+            setTimeout(() => {
+                window.location.href = "./login";
+            }, 2000);
+            
+            console.log(nombre, email, password, repassword);
+            registrado.style.display = "flex";
+        }
         console.log(nombre, email, password, repassword);
-        registrado.style.display = "flex";
-/*
-        setTimeout(() => {
-            window.location.href = "./login";
-        }, 2000);
-*/
+
+
+
     }
 });
 
 async function createUser(userData) {
     try {
-        const response = await
-            fetch('/api/api/registro', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(userData)
-            });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
+        const response = await fetch('/api/api/registro', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userData)
+        });
 
         const data = await response.json();
         console.log('User created successfully:', data);
-        console.log(data);
+        const resultadoEmail = data.email;
+        console.log(resultado);
+        if (resultadoEmail == "Email ya existente") {
+            return false;
+        } else {
+            return true;
+        }
     } catch (error) {
-        console.error('There was a problem with the fetch operation:', error);
-        console.log(data);
+        console.error('Error creating user:', error);
+        return null;
     }
 }
 

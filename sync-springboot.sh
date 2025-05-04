@@ -1,18 +1,24 @@
 #!/bin/bash
 
-# Replace with your real pod name
-POD_NAME="springboot-app-5fcbcdf985-bk6vt"
+# Exit immediately on error
+set -e
 
-# Path to your local built JAR
-LOCAL_JAR="./apps/springboot-app/target/springboot-app-0.0.1-SNAPSHOT.jar"
+# App configuration
+APP_NAME="springboot-app"
+APP_PATH="./apps/springboot-app"
+DOCKER_IMAGE="${APP_NAME}:latest"
+DEPLOYMENT_YAML="./infra/k8s/springboot/deployment.yml"
 
-# Path inside container where the JAR is (adjust this based on your check!)
-REMOTE_JAR_PATH="/app.jar"
+echo "🔧 Setting Docker to use Minikube environment..."
+eval $(minikube docker-env)
 
-echo "Syncing backend JAR to pod: $POD_NAME"
+echo "🐳 Building Docker image: $DOCKER_IMAGE"
+docker build -t "$DOCKER_IMAGE" "$APP_PATH"
 
-# Copy the JAR
-kubectl cp "$LOCAL_JAR" "$POD_NAME:$REMOTE_JAR_PATH"
+echo "📦 Applying Kubernetes Deployment from $DEPLOYMENT_YAML"
+kubectl apply -f "$DEPLOYMENT_YAML"
 
-# Restart the application process (if needed)
-kubectl exec "$POD_NAME" -- pkill -f 'java'
+echo "♻️ Restarting Deployment: $APP_NAME"
+kubectl rollout restart deployment "$APP_NAME"
+
+echo "✅ Done. Your updated Spring Boot app is now running in Minikube."
