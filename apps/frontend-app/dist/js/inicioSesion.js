@@ -6,7 +6,7 @@ let password = document.getElementById('password');
 //Crea un json en el servidor con el id del usuario logeado
 //para almacenar quienes le siguen
 
-
+let parseado;
 
 boton.addEventListener('click', function () {
     console.log(email.value);
@@ -22,23 +22,30 @@ boton.addEventListener('click', function () {
         .then(response => response.text())
         .then(data => {
             console.log(data)
-            let parseado = JSON.parse(data);
+            if (!(data === "")) {
+                parseado = JSON.parse(data);
+                console.log(parseado);
+            }
+
+
             if (data == "") {
                 console.log(data);
                 let error = document.getElementById('error');
-                error.textContent = "Email invalido";
-                
-            } else if(!(parseado.password == password.value)){
+                error.style.display = "block";
+                error.textContent = "Email no registrado";
+            } else if (!(parseado.password == password.value)) {
                 console.log(data);
                 console.log(parseado.password);
                 console.log(typeof data);
 
                 let error = document.getElementById('error');
+                error.style.display = "block";
                 error.textContent = "Contraseña incorrecta";
-            }else{
+            } else {
                 console.log(data);
                 let error = document.getElementById('error');
                 error.textContent = "";
+                error.style.display = "none";
 
                 let url1 = "api/api/UsuarioEmail?dato=" + email.value + "";
 
@@ -51,12 +58,22 @@ boton.addEventListener('click', function () {
                 localStorage.setItem("foto_bannerLogeado", parseado.foto_banner);
                 localStorage.setItem("logeado", true);
                 console.log(localStorage.getItem("id"), localStorage.getItem("email"), localStorage.getItem("nombre"), localStorage.getItem("apellido"), localStorage.getItem("password"), localStorage.getItem("npubliaciones"));
-                
 
-                let link = "./index";
-                window.location.href = link;
+                if (parseado.primera_vez == 1) {
 
+                    setTimeout(() => {
+                        window.location.href = "./finPerfil";
+                    }, 2000);
+                } else {
+                    /*
+                    let link = "./index";
+                    window.location.href = link;
+                    */
+                }
 
             }
         })
 })
+
+
+

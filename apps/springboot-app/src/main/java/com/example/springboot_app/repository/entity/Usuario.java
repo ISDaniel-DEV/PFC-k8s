@@ -37,5 +37,7 @@ public class Usuario {
     @Column(name= "foto_banner")
     private String foto_banner;
 
-    
+    @Basic
+    @Column(name= "primera_vez")
+    private Boolean primera_vez;
 }

@@ -1,24 +1,13 @@
 #!/bin/bash
 
-# Exit immediately on error
-set -e
+POD=$(kubectl get pods -l app=springboot-app -o jsonpath="{.items[0].metadata.name}")
+JAR=./target/springboot-app-0.0.1-SNAPSHOT.jar
 
-# App configuration
-APP_NAME="springboot-app"
-APP_PATH="./apps/springboot-app"
-DOCKER_IMAGE="${APP_NAME}:latest"
-DEPLOYMENT_YAML="./infra/k8s/springboot/deployment.yml"
+echo "Building app..."
+./apps/springboot-app/mvnw clean package || exit 1
 
-echo "🔧 Setting Docker to use Minikube environment..."
-eval $(minikube docker-env)
+echo "Copying JAR to pod..."
+kubectl cp $JAR $POD:/app.jar
 
-echo "🐳 Building Docker image: $DOCKER_IMAGE"
-docker build -t "$DOCKER_IMAGE" "$APP_PATH"
-
-echo "📦 Applying Kubernetes Deployment from $DEPLOYMENT_YAML"
-kubectl apply -f "$DEPLOYMENT_YAML"
-
-echo "♻️ Restarting Deployment: $APP_NAME"
-kubectl rollout restart deployment "$APP_NAME"
-
-echo "✅ Done. Your updated Spring Boot app is now running in Minikube."
+echo "Restarting app..."
+kubectl exec $POD -- pkill -f 'java'

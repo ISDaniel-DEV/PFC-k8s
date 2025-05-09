@@ -1,0 +1,144 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: lighter;
+}
+body{
+    display: flex;
+    flex-direction: row;
+    background: linear-gradient(-45deg, #8980db, #41c0ff);
+    background-size: 400% 400%;
+    animation: gradient 20s ease infinite;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 100% 50%;
+        
+    }
+    50% {
+        background-position: 0% 50%;
+    }
+    100% {
+        background-position: 100% 50%;
+    }
+}
+
+main{
+    position: relative;
+    border-radius: 10px;
+    width: 60%;
+    height: 70%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-direction: column;
+    background-color: aliceblue;
+    padding: 10px;
+    box-shadow: 0px 0px 20px 5px rgba(0, 0, 0, 0.2);
+}
+
+#ejemplo{
+    position: relative;
+    width: 90%;
+    height: 50%;
+    background-color: rgb(211, 211, 211);
+    border-radius: 10px;
+}
+
+#ejemplo img{
+    position: absolute;
+    border-radius: 10px 10px 0px 0px;
+}
+
+#ejemplo img:nth-child(1){
+    top: 80px;
+    left: 70px;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    z-index: 3;
+    object-fit: cover;
+    border: 2px solid white;
+}
+#ejemplo img:nth-child(2){
+    top: 0px;
+    right: 0;
+    width: 100%;
+    height: 115px;
+    object-fit: cover;
+}
+
+#ejemplo h2{
+    position: absolute;
+    top: 160px;
+    left: 70px;
+    font-size: 20px;
+    font-weight: lighter;
+}
+
+main section{
+    display: flex;
+    justify-content: space-around;
+    flex-direction: row;
+    width: 90%;
+}
+
+main section div{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+
+#botonesFotos button{
+    margin-top: 20px;
+    width: 150px;
+    height: 40px;
+    border-radius: 10px;
+    border-style: hidden;
+    background-color: #767676;
+    color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    font-weight:normal;
+    padding-top: 8px;
+    padding-bottom: 10px;
+    transition-duration: 0.3s;
+}
+
+#botonera{
+ display: flex;
+ justify-content: flex-end;
+ width:90%;
+}
+
+#botonera button{
+    margin-top: 20px;
+    width: 150px;
+    height: 40px;
+    border-radius: 10px;
+    border-style: hidden;
+    background-color: #0c99e0;
+    color: #c7ecff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    font-weight:normal;
+    padding-top: 8px;
+    padding-bottom: 10px;
+    transition-duration: 0.3s;
+}
+
+input{
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 10px;
+}

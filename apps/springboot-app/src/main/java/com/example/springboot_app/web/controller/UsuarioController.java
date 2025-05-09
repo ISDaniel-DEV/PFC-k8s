@@ -31,7 +31,7 @@ public class UsuarioController {
 
         if(existente != null){
             log.error("El email ya existe");
-            UsuarioDTO.updateUsuarioDTO(usuarioDTO, "", "Email ya existente", "",0, "","");
+            UsuarioDTO.updateUsuarioDTO(usuarioDTO, "", "Email ya existente", "",0, "","",false);
             return usuarioDTO;
         }else{
             log.info("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa pene" + usuarioDTO);

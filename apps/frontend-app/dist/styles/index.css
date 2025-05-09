@@ -38,18 +38,10 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 86.5vh;
-    animation: zoomout 0.7s forwards ease-in-out;
     overflow-x: hidden;
 }
 
-@keyframes zoomout {
-    from {
-        transform: scale(1.2);
-    }
-    to {
-        transform: scale(1);
-    }
-}
+
 
 
 header {
