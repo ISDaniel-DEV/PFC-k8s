@@ -8,6 +8,13 @@ let password = document.getElementById('password');
 
 let parseado;
 
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      console.log('Enter was pressed!');
+      boton.click();
+    }
+});
+
 boton.addEventListener('click', function () {
     console.log(email.value);
     console.log(password.value);

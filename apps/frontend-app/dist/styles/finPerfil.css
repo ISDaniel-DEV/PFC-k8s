@@ -137,6 +137,16 @@ main section div{
     transition-duration: 0.3s;
 }
 
+#botonera button:hover{
+    transform: scale(1.01);
+    background-color: #0f81bb;
+}
+
+#botonesFotos button:hover{
+    transform: scale(1.01);
+    background-color: #8b8b8b;
+}   
+
 input{
     padding: 10px;
     margin-top: 5px;

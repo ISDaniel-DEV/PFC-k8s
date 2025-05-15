@@ -1,10 +1,27 @@
 const fs = require('fs');
-
+const path = require('path');
 const express = require('express');
+const multer = require('multer');
 const app = express();
 const PORT = 3000;
 
 const cors = require('cors');
+
+// Configure multer for handling file uploads
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const uploadDir = './uploads';
+        if (!fs.existsSync(uploadDir)){
+            fs.mkdirSync(uploadDir);
+        }
+        cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+
+const upload = multer({ storage: storage });
 
 // Allow requests from Spring Boot's origin (http://localhost:8888)
 app.use(cors({
@@ -13,7 +30,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-
 // Crear un objeto JSON con schema ya hecho y array vacio
 const schema = JSON.stringify({
     seguidores: [],
@@ -21,6 +37,27 @@ const schema = JSON.stringify({
 });
 
 app.use(express.json());
+app.use('/uploads', express.static('uploads'));
+
+app.post('/upload/profile', upload.single('profileImage'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+    }
+    res.json({ 
+        success: true, 
+        filePath: `/uploads/${req.file.filename}`
+    });
+});
+
+app.post('/upload/banner', upload.single('bannerImage'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+    }
+    res.json({ 
+        success: true, 
+        filePath: `/uploads/${req.file.filename}`
+    });
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
