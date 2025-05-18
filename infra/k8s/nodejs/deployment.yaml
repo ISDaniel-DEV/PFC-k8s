@@ -18,3 +18,15 @@ spec:
           imagePullPolicy: Never
           ports:
             - containerPort: 3000
+          volumeMounts:
+            - name: uploads-volume
+              mountPath: /app/uploads
+            - name: followers-volume
+              mountPath: /app/followers
+      volumes:
+        - name: uploads-volume
+          persistentVolumeClaim:
+            claimName: uploads-pvc
+        - name: followers-volume
+          persistentVolumeClaim:
+            claimName: followers-pvc

@@ -19,7 +19,7 @@ boton.addEventListener('click', function () {
     console.log(email.value);
     console.log(password.value);
 
-    let url1 = "/api/api/UsuarioEmail?dato=" + email.value + "";
+    let url1 = "/api/UsuarioEmail?dato=" + email.value + "";
     fetch(url1, {
         method: "GET",
         headers: {
@@ -54,7 +54,7 @@ boton.addEventListener('click', function () {
                 error.textContent = "";
                 error.style.display = "none";
 
-                let url1 = "api/api/UsuarioEmail?dato=" + email.value + "";
+                let url1 = "/api/UsuarioEmail?dato=" + email.value + "";
 
                 console.log("funciono");
                 localStorage.setItem("idLogeado", parseado.id);
@@ -72,10 +72,10 @@ boton.addEventListener('click', function () {
                         window.location.href = "./finPerfil";
                     }, 2000);
                 } else {
-                    /*
+                    
                     let link = "./index";
                     window.location.href = link;
-                    */
+                    
                 }
 
             }

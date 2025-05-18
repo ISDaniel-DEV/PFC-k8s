@@ -6,6 +6,13 @@ async function bajarNumero() {
     }, 1000);
 }
 
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      console.log('Enter was pressed!');
+      registrar.click();
+    }
+});
+
 let resultado;
 
 registrar.addEventListener('click', async function () {
@@ -146,7 +153,8 @@ registrar.addEventListener('click', async function () {
         password: password,
         npublicaciones: 0,
         foto_perfil: fotoPerfil,
-        foto_banner: fotoBanner
+        foto_banner: fotoBanner,
+        primera_vez: true
     };
 
     if (validador == true) {
@@ -180,7 +188,7 @@ registrar.addEventListener('click', async function () {
 
 async function createUser(userData) {
     try {
-        const response = await fetch('/api/api/registro', {
+        const response = await fetch('/api/registro', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

@@ -8,12 +8,21 @@ const PORT = 3000;
 const cors = require('cors');
 
 // Configure multer for handling file uploads
+// Create uploads directory if it doesn't exist
+const uploadDir = '/app/uploads';
+try {
+    if (!fs.existsSync(uploadDir)) {
+        console.log('Creating upload directory:', uploadDir);
+        fs.mkdirSync(uploadDir, { recursive: true, mode: 0o777 });
+    }
+    console.log('Upload directory exists:', uploadDir);
+    console.log('Directory contents:', fs.readdirSync(uploadDir));
+} catch (err) {
+    console.error('Error creating upload directory:', err);
+}
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const uploadDir = './uploads';
-        if (!fs.existsSync(uploadDir)){
-            fs.mkdirSync(uploadDir);
-        }
         cb(null, uploadDir);
     },
     filename: function (req, file, cb) {
@@ -23,12 +32,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Allow requests from Spring Boot's origin (http://localhost:8888)
-app.use(cors({
-  origin: 'http://localhost:8080', // Your Spring Boot server's origin
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+// Allow requests from all origins in development
+app.use(cors());
 
 // Crear un objeto JSON con schema ya hecho y array vacio
 const schema = JSON.stringify({
@@ -37,47 +42,148 @@ const schema = JSON.stringify({
 });
 
 app.use(express.json());
-app.use('/uploads', express.static('uploads'));
 
-app.post('/upload/profile', upload.single('profileImage'), (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ error: 'No file uploaded' });
-    }
-    res.json({ 
-        success: true, 
-        filePath: `/uploads/${req.file.filename}`
-    });
+// Log all requests
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    next();
 });
 
-app.post('/upload/banner', upload.single('bannerImage'), (req, res) => {
+// Serve uploaded files
+// Serve static files with debug logging
+const serveUploads = express.static('/app/uploads');
+app.use('/node/uploads', (req, res, next) => {
+    console.log('Accessing file:', req.url);
+    console.log('Full path:', '/app/uploads/' + req.url.split('/').pop());
+    console.log('File exists:', fs.existsSync('/app/uploads/' + req.url.split('/').pop()));
+    console.log('Directory contents:', fs.readdirSync('/app/uploads'));
+    serveUploads(req, res, next);
+});
+
+// Keep this for backward compatibility
+app.use('/uploads', serveUploads);
+
+// Log static file requests
+app.use((req, res, next) => {
+    if (req.url.startsWith('/node/uploads/') || req.url.startsWith('/uploads/')) {
+        console.log('Static file request:', req.url);
+        console.log('File exists:', fs.existsSync('/app/uploads/' + req.url.split('/').pop()));
+        console.log('Directory contents:', fs.readdirSync('/app/uploads'));
+    }
+    next();
+});
+
+const handleProfileUpload = (req, res) => {
+    console.log('Profile upload request received');
+    console.log('File:', req.file);
     if (!req.file) {
-        return res.status(400).json({ error: 'No file uploaded' });
+        // No file uploaded, but that's okay
+        return res.json({ 
+            success: true,
+            fileUpdated: false
+        });
     }
     res.json({ 
-        success: true, 
-        filePath: `/uploads/${req.file.filename}`
+        success: true,
+        fileUpdated: true,
+        filePath: `/node/uploads/${req.file.filename}`
     });
+};
+
+app.post('/node/upload/profile', upload.single('profileImage'), handleProfileUpload);
+app.post('/upload/profile', upload.single('profileImage'), handleProfileUpload);
+
+const handleBannerUpload = (req, res) => {
+    console.log('Banner upload request received');
+    console.log('File:', req.file);
+    if (!req.file) {
+        // No file uploaded, but that's okay
+        return res.json({ 
+            success: true,
+            fileUpdated: false
+        });
+    }
+    res.json({ 
+        success: true,
+        fileUpdated: true,
+        filePath: `/node/uploads/${req.file.filename}`
+    });
+};
+
+app.post('/node/upload/banner', upload.single('bannerImage'), handleBannerUpload);
+app.post('/upload/banner', upload.single('bannerImage'), handleBannerUpload);
+
+// Follower endpoints
+app.post('/node/nuevoSeguidor/:id/:idSeguidor', (req, res) => {
+    const { id, idSeguidor } = req.params;
+    console.log(`Adding follower: ${idSeguidor} to user: ${id}`);
+    
+    try {
+        // Create followers file if it doesn't exist
+        const followersDir = '/app/followers';
+        if (!fs.existsSync(followersDir)) {
+            fs.mkdirSync(followersDir, { recursive: true });
+        }
+        
+        const filePath = path.join(followersDir, `${id}.json`);
+        let data = { seguidores: [], seguidos: [] };
+        
+        if (fs.existsSync(filePath)) {
+            data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        }
+        
+        // Add follower if not already following
+        if (!data.seguidores.includes(idSeguidor)) {
+            data.seguidores.push(idSeguidor);
+            fs.writeFileSync(filePath, JSON.stringify(data));
+        }
+        
+        // Update the follower's 'seguidos' list
+        const followerPath = path.join(followersDir, `${idSeguidor}.json`);
+        let followerData = { seguidores: [], seguidos: [] };
+        
+        if (fs.existsSync(followerPath)) {
+            followerData = JSON.parse(fs.readFileSync(followerPath, 'utf8'));
+        }
+        
+        if (!followerData.seguidos.includes(id)) {
+            followerData.seguidos.push(id);
+            fs.writeFileSync(followerPath, JSON.stringify(followerData));
+        }
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error adding follower:', error);
+        res.status(500).json({ error: 'Error adding follower' });
+    }
+});
+
+app.post('/node/cantidadSeguidores/:id', (req, res) => {
+    const { id } = req.params;
+    console.log(`Getting follower count for user: ${id}`);
+    
+    try {
+        const followersDir = '/app/followers';
+        const filePath = path.join(followersDir, `${id}.json`);
+        
+        if (!fs.existsSync(filePath)) {
+            return res.json({ cantidadSeguidores: 0, cantidadSeguidos: 0 });
+        }
+        
+        const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        res.json({
+            cantidadSeguidores: data.seguidores.length,
+            cantidadSeguidos: data.seguidos.length
+        });
+    } catch (error) {
+        console.error('Error getting follower count:', error);
+        res.status(500).json({ error: 'Error getting follower count' });
+    }
 });
 
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
-
-app.get('/tshirt', (req, res) => {
-    res.send('Hello World!');
-} );
-
-app.post('/tshirt/:id', (req, res) => {
-    const { id } = req.params;
-    const { logo } = req.body;
-
-    if (!logo) {
-        res.status(418).send({message:'Logo is required'});
-    }
-
-    res.send({ tshirt: `T-shirt with ID ${id} and logo ${logo} created`});
-});
-
 
 //Crear JSON
 

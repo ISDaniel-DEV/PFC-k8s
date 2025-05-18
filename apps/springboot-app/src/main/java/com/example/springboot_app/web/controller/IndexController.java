@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 @RestController
-@RequestMapping("/")
+@CrossOrigin(origins = "*")
 public class IndexController {
 
     private static final Logger log = LoggerFactory.getLogger(IndexController.class);
@@ -21,7 +21,7 @@ public class IndexController {
     @Autowired
     private UsuarioService usuarioService;
 
-    @GetMapping("/api/UsuarioEmail")
+    @GetMapping("/UsuarioEmail")
     public UsuarioDTO ByEmail(@RequestParam String dato) {
         if (dato == null || dato.isEmpty()) {
             log.error("El dato no puede ser nulo o vacío");
@@ -36,12 +36,27 @@ public class IndexController {
 
     }
 
-    @PostMapping("/api/updateUser")
+    @PostMapping("/updateUser")
     public UsuarioDTO updateUser(@RequestBody UsuarioDTO usuarioDTO) {
         log.info("UsuarioRestController - updateUser: Actualizar usuario: " +
                 usuarioDTO.toString());
         usuarioService.save(usuarioDTO);
         return usuarioDTO;
+    }
+
+    @PostMapping("/updatePrimeraVez")
+    public UsuarioDTO updatePrimeraVez(@RequestParam String email) {
+        log.info("UsuarioRestController - updatePrimeraVez: Request received");
+        log.info("Email parameter: " + email);
+        UsuarioDTO usuarioDTO = new UsuarioDTO();
+        usuarioDTO.setEmail(email);
+        UsuarioDTO usuario = usuarioService.findByEmail(usuarioDTO);
+        if (usuario != null) {
+            usuario.setPrimera_vez(false);
+            usuarioService.save(usuario);
+            return usuario;
+        }
+        return null;
 
     }
 

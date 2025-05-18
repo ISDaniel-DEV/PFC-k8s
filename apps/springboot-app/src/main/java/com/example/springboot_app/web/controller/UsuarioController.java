@@ -20,7 +20,7 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
     
-    @PostMapping("/api/registro")
+    @PostMapping("/registro")
     public UsuarioDTO save(@RequestBody UsuarioDTO usuarioDTO) {
         log.info("UsuarioRestController - save: Guardar usuario: " + usuarioDTO.toString());
         
