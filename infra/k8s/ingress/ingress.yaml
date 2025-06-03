@@ -3,29 +3,49 @@ kind: Ingress
 metadata:
   name: app-ingress
   annotations:
-    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
 spec:
   ingressClassName: nginx
   rules:
     - host: pfc.local
       http:
         paths:
-          - path: /node/.*
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: nodejs-service
-                port:
-                  number: 3000
-          - path: /api/(.*)
-            pathType: ImplementationSpecific
+          # API routes - exact matches first
+          - path: /api/UsuarioEmail
+            pathType: Exact
             backend:
               service:
                 name: springboot-service
                 port:
                   number: 8888
-          - path: /(.*)
-            pathType: ImplementationSpecific
+          - path: /api/publicaciones
+            pathType: Exact
+            backend:
+              service:
+                name: springboot-service
+                port:
+                  number: 8888
+          # Node.js service
+          - path: /node
+            pathType: Prefix
+            backend:
+              service:
+                name: nodejs-service
+                port:
+                  number: 3000
+          # Other API routes
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: springboot-service
+                port:
+                  number: 8888
+          # Frontend static files
+          - path: /
+            pathType: Prefix
             backend:
               service:
                 name: frontend

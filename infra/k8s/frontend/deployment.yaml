@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
+  labels:
+    app: frontend
 spec:
   replicas: 1
   selector:
@@ -13,8 +15,27 @@ spec:
         app: frontend
     spec:
       containers:
-        - name: nginx
-          image: frontend:latest
-          imagePullPolicy: Never
+        - name: frontend
+          image: calvinhub/pfc-k8s-frontend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10

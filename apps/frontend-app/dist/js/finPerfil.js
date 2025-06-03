@@ -17,8 +17,41 @@ console.log(fotoPerfil, fotoBanner);
 
 nombre.textContent = localStorage.getItem("nombreLogeado");
 
-fotoPerfilElement.src = localStorage.getItem("foto_perfilLogeado") || './img/perfil/perfil_default.png';
-fotoBannerElement.src = localStorage.getItem("foto_bannerLogeado") || './img/perfil/banner_default.png';
+// Obtener las rutas de las imágenes del localStorage
+let perfilImgPath = localStorage.getItem("foto_perfilLogeado");
+let bannerImgPath = localStorage.getItem("foto_bannerLogeado");
+
+const defaultPerfilImg = './img/perfil/perfil_default.png';
+const defaultBannerImg = './img/perfil/banner_default.png';
+
+// Función para determinar la URL final de la imagen
+function getImageUrl(imagePath, defaultImagePath) {
+    if (!imagePath) {
+        return defaultImagePath; // No hay imagen guardada, usar la predeterminada
+    }
+    // Si la ruta guardada es una de las predeterminadas (o una ruta relativa que no sea de 'uploads')
+    if (imagePath.includes('img/perfil/') || imagePath.startsWith('./img/perfil/')) {
+        // Asegurarse de que sea una ruta relativa correcta para el frontend
+        return imagePath.startsWith('.') ? imagePath : './' + imagePath.substring(imagePath.indexOf('img/perfil/'));
+    }
+    // Si es una imagen subida (debería empezar con 'uploads/' o ya tener '/node/uploads/')
+    if (imagePath.startsWith('uploads/')) {
+        return '/node/' + imagePath; 
+    }
+    if (imagePath.startsWith('/node/uploads/')) {
+        return imagePath; // Ya tiene el formato correcto
+    }
+    // Si es una URL completa, usarla tal cual
+    if (imagePath.startsWith('http')) {
+        return imagePath;
+    }
+    // Como último recurso, si no coincide con nada, intentar usar la predeterminada
+    // o si es una ruta inesperada, podría ser un error y mostrar la predeterminada.
+    return defaultImagePath; 
+}
+
+fotoPerfilElement.src = getImageUrl(perfilImgPath, defaultPerfilImg);
+fotoBannerElement.src = getImageUrl(bannerImgPath, defaultBannerImg);
 
 // Preview images when selected
 fotoInput.addEventListener('change', function (e) {

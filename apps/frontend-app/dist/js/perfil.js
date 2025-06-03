@@ -4,6 +4,13 @@ var fuera = false;
 
 let logeado1 = localStorage.getItem("logeado");
 
+let subir = document.getElementById("subir");
+
+subir.addEventListener("click", function () {
+    window.location.href = "publicar";
+})
+
+
 if (!logeado1) {
     desplegable.classList.add("nav1");
     desplegable.classList.remove("nav2");
@@ -23,10 +30,36 @@ let cantidadSeguidos = document.getElementById("cantidadSeguidos");
 let foto_perfil = document.getElementById("foto_perfil");
 let foto_banner = document.getElementById("foto_banner");
 
-foto_banner.src = fotoBanner;
-foto_perfil.src = fotoPerfil;
+// Función para normalizar la ruta de la imagen
+function normalizeImagePath(imgPath) {
+    if (!imgPath) return imgPath;
+    
+    // Si la ruta ya es absoluta o comienza con http, dejarla como está
+    if (imgPath.startsWith('http') || imgPath.startsWith('/node')) {
+        return imgPath;
+    }
+    
+    // Si la ruta no comienza con /, agregar /node/
+    if (!imgPath.startsWith('/')) {
+        return '/node/' + imgPath;
+    }
+    
+    // Si la ruta comienza con / pero no con /node, agregar /node al principio
+    return '/node' + imgPath;
+}
 
-nombrePerfil.textContent = nombre;
+if (foto_banner) {
+    foto_banner.src = fotoBanner ? normalizeImagePath(fotoBanner) : './img/perfil/banner_default.png';
+}
+if (foto_perfil) {
+    foto_perfil.src = fotoPerfil ? normalizeImagePath(fotoPerfil) : './img/perfil/perfil_default.png';
+}
+
+if (nombrePerfil) {
+    nombrePerfil.textContent = nombre;
+} else {
+    console.error('Elemento nombrePerfil no encontrado en el DOM');
+}
 
 
 let seguir = document.getElementById("seguir");
@@ -59,6 +92,7 @@ function nuevoSeguidor(id, idSeguidor) {
 
 
 }
+
 
 fetch(`node/cantidadSeguidores/${id}`, {
     method: 'POST',

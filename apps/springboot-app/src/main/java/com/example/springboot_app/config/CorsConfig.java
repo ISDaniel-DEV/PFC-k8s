@@ -15,7 +15,8 @@ public class CorsConfig implements WebMvcConfigurer {
         registry.addMapping("/**") // Allow all paths
                 .allowedOrigins(
                         "http://localhost:8080", // Frontend container
-                        "http://localhost:8888" // Optional: Allow direct access
+                        "http://localhost:8888", // Optional: Allow direct access
+                        "http://pfc.local" // Frontend domain
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allowed HTTP methods
                 .allowedHeaders("*") // All headers

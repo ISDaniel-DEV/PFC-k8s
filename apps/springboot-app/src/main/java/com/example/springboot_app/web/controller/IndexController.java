@@ -11,8 +11,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 
 @RestController
+@RequestMapping("/api")
 @CrossOrigin(origins = "*")
 public class IndexController {
 
@@ -22,18 +26,31 @@ public class IndexController {
     private UsuarioService usuarioService;
 
     @GetMapping("/UsuarioEmail")
-    public UsuarioDTO ByEmail(@RequestParam String dato) {
-        if (dato == null || dato.isEmpty()) {
-            log.error("El dato no puede ser nulo o vacío");
-            return null;
-        } else {
-            log.info(dato);
+    public ResponseEntity<?> ByEmail(@RequestParam String dato) {
+        try {
+            if (dato == null || dato.isEmpty()) {
+                log.error("El email no puede ser nulo o vacío");
+                return ResponseEntity.badRequest().body("El email es requerido");
+            }
+            
+            log.info("Buscando usuario con email: {}", dato);
             UsuarioDTO usuarioDTO = new UsuarioDTO();
             usuarioDTO.setEmail(dato);
-            log.info(String.valueOf(usuarioDTO));
-            return usuarioService.findByEmail(usuarioDTO);
+            
+            UsuarioDTO usuarioEncontrado = usuarioService.findByEmail(usuarioDTO);
+            
+            if (usuarioEncontrado == null) {
+                log.info("No se encontró ningún usuario con el email: {}", dato);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
+            }
+            
+            log.info("Usuario encontrado: {}", usuarioEncontrado);
+            return ResponseEntity.ok(usuarioEncontrado);
+            
+        } catch (Exception e) {
+            log.error("Error al buscar usuario por email: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor");
         }
-
     }
 
     @PostMapping("/updateUser")

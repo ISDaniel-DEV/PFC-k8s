@@ -14,8 +14,8 @@ import java.util.Optional;
 @Transactional
 public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
 
-    @Query(value = "SELECT * FROM usuario WHERE email = :idc", nativeQuery = true)
-    public Optional<Usuario> findUsuario(@Param("idc") String nif);
+    @Query(value = "SELECT * FROM usuario WHERE email = :email", nativeQuery = true)
+    public Optional<Usuario> findUsuario(@Param("email") String email);
 
     @Query(value = "SELECT * FROM usuario WHERE password = :idc1", nativeQuery = true)
     public List <Usuario> findDep(@Param("idc1") int dep);

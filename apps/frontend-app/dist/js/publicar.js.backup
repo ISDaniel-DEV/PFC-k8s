@@ -1,0 +1,539 @@
+// Variables globales
+let archivosSeleccionados = [];
+let imagenPortada = null;
+const MAX_ARCHIVOS = 10;
+const MAX_TAMANO_MB = 50; // 50MB por archivo (coincide con el backend)
+const MAX_TAMANO_PORTADA_MB = 10; // 10MB para la imagen de portada
+
+// Inicialización cuando el DOM esté completamente cargado
+document.addEventListener('DOMContentLoaded', function () {
+    const inputArchivos = document.getElementById('archivos');
+    const contenedorArchivos = document.getElementById('archivos-seleccionados');
+    const dropZone = document.getElementById('drop-zone');
+    const formulario = document.querySelector('form') || document.querySelector('section');
+    const siguienteBoton = document.getElementById('siguiente');
+    const fotoInput = document.getElementById('fotoInput');
+    const portadaPreview = document.getElementById('portadaPreview');
+    const portadaSeleccionada = document.getElementById('portadaSeleccionada');
+    const portadaEliminar = document.getElementById('portadaEliminar');
+    const subirBtn = document.getElementById('subir');
+
+    // Redirigir si no está logueado
+    if (typeof logeado1 !== 'undefined' && !logeado1) {
+        window.location.href = 'index';
+    }
+
+    // Configurar el botón de subir
+    if (subirBtn) {
+        subirBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            window.location.href = 'publicar';
+        });
+    }
+
+    // Función para mostrar notificaciones
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        // Eliminar la notificación después de 5 segundos
+        setTimeout(() => {
+            notification.classList.add('fade-out');
+            setTimeout(() => notification.remove(), 300);
+        }, 5000);
+    }
+
+    // Estilos para las notificaciones
+    const style = document.createElement('style');
+    style.textContent = `
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 4px;
+            color: white;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateX(120%);
+            transition: transform 0.3s ease-out;
+            max-width: 300px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.fade-out {
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+        }
+        
+        .notification.info {
+            background-color: #2196F3;
+        }
+        
+        .notification.success {
+            background-color: #4CAF50;
+        }
+        
+        .notification.warning {
+            background-color: #FF9800;
+        }
+        
+        .notification.error {
+            background-color: #F44336;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Mostrar notificación después de agregar el estilo
+    setTimeout(() => {
+        const notification = document.querySelector('.notification');
+        if (notification) notification.classList.add('show');
+    }, 10);
+
+    // Manejar la selección de la imagen de portada
+    if (fotoInput && portadaSeleccionada) {
+        fotoInput.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Validar tipo de archivo
+            if (!file.type.startsWith('image/')) {
+                showNotification('Por favor, selecciona un archivo de imagen válido', 'error');
+                this.value = '';
+                return;
+            }
+
+
+            // Validar tamaño (máximo 10MB)
+            if (file.size > MAX_TAMANO_PORTADA_MB * 1024 * 1024) {
+                showNotification(`La imagen de portada no debe superar los ${MAX_TAMANO_PORTADA_MB}MB`, 'error');
+                this.value = '';
+                return;
+            }
+
+            // Mostrar vista previa
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                // Reducir el tamaño de la imagen antes de subirla
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const maxSize = 1200; // Ancho máximo
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > maxSize) {
+                        height = (height * maxSize) / width;
+                        width = maxSize;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Dibujar la imagen redimensionada
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Convertir a blob y actualizar la imagen de portada
+                    canvas.toBlob((blob) => {
+                        if (!blob) {
+                            console.error('No se pudo crear el blob de la imagen');
+                            showNotification('Error al procesar la imagen de portada', 'error');
+                            return;
+                        }
+                        
+                        // Crear un nombre de archivo único para evitar problemas de caché
+                        const fileName = `portada_${Date.now()}.jpg`;
+                        
+                        // Crear un nuevo archivo con el blob redimensionado
+                        const resizedFile = new File([blob], fileName, {
+                            type: 'image/jpeg',
+                            lastModified: Date.now()
+                        });
+                        
+                        // Actualizar la referencia al archivo
+                        imagenPortada = resizedFile;
+                        
+                        // Mostrar la vista previa de la imagen redimensionada
+                        try {
+                            const previewUrl = URL.createObjectURL(blob);
+                            
+                            // Limpiar contenido previo
+                            portadaSeleccionada.innerHTML = '';
+                            
+                            // Crear elemento de imagen para la vista previa
+                            const previewImg = document.createElement('img');
+                            previewImg.onload = function() {
+                                URL.revokeObjectURL(previewUrl); // Liberar memoria
+                            };
+                            previewImg.src = previewUrl;
+                            previewImg.alt = 'Vista previa de la portada';
+                            previewImg.style.maxWidth = '100%';
+                            previewImg.style.height = 'auto';
+                            previewImg.style.borderRadius = '8px';
+                            
+                            // Agregar botón para eliminar la imagen
+                            const eliminarBtn = document.createElement('button');
+                            eliminarBtn.innerHTML = '&times;';
+                            eliminarBtn.className = 'btn-eliminar-portada';
+                            eliminarBtn.onclick = function(e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                portadaSeleccionada.innerHTML = '';
+                                imagenPortada = null;
+                                if (fotoInput) fotoInput.value = ''; // Limpiar el input file
+                                showNotification('Imagen de portada eliminada', 'info');
+                                
+                                // Restaurar el texto del botón
+                                if (portadaPreview) {
+                                    const span = portadaPreview.querySelector('span');
+                                    if (span) span.textContent = 'Seleccionar imagen';
+                                }
+                            };
+                            
+                            portadaSeleccionada.appendChild(previewImg);
+                            portadaSeleccionada.appendChild(eliminarBtn);
+                            portadaSeleccionada.style.display = 'block';
+                            
+                            // Actualizar el texto del botón
+                            if (portadaPreview) {
+                                const span = portadaPreview.querySelector('span');
+                                if (span) span.textContent = 'Cambiar imagen';
+                            }
+                            
+                            // Mostrar notificación de éxito
+                            showNotification('Imagen de portada cargada correctamente', 'success');
+                        } catch (error) {
+                            console.error('Error al crear la vista previa:', error);
+                            showNotification('Error al procesar la imagen de portada', 'error');
+                        }
+                    }, 'image/jpeg', 0.8);
+                };
+                
+                // Iniciar la carga de la imagen
+                img.src = event.target.result;
+            };
+            
+            // Leer el archivo como URL de datos
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // Función para validar archivos
+    function validarArchivo(archivo) {
+        // Validar tamaño
+        if (archivo.size > MAX_TAMANO_MB * 1024 * 1024) {
+            showNotification(`El archivo ${archivo.name} es demasiado grande (máx. ${MAX_TAMANO_MB}MB)`, 'error');
+            return false;
+        }
+        
+        // Validar tipo de archivo
+        const tiposPermitidos = [
+            'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.ms-powerpoint',
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'application/vnd.ms-excel',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'text/plain',
+            'application/zip',
+            'application/x-rar-compressed',
+            'application/x-7z-compressed'
+        ];
+        
+        if (!tiposPermitidos.includes(archivo.type)) {
+            showNotification(`Tipo de archivo no permitido: ${archivo.name}`, 'error');
+            return false;
+        }
+        
+        return true;
+    }
+
+    // Función para mostrar archivos seleccionados
+    function mostrarArchivosSeleccionados() {
+        if (!contenedorArchivos) return;
+        
+        contenedorArchivos.innerHTML = '';
+        
+        if (archivosSeleccionados.length === 0) {
+            contenedorArchivos.innerHTML = '<p>No hay archivos seleccionados</p>';
+            return;
+        }
+        
+        const lista = document.createElement('ul');
+        lista.className = 'lista-archivos';
+        
+        archivosSeleccionados.forEach((archivo, index) => {
+            const item = document.createElement('li');
+            item.className = 'archivo-item';
+            
+            const icono = document.createElement('span');
+            icono.className = 'icono-archivo';
+            icono.innerHTML = obtenerIconoPorTipo(archivo.type);
+            
+            const nombre = document.createElement('span');
+            nombre.className = 'nombre-archivo';
+            nombre.textContent = archivo.name;
+            
+            const tamano = document.createElement('span');
+            tamano.className = 'tamano-archivo';
+            tamano.textContent = formatFileSize(archivo.size);
+            
+            const eliminarBtn = document.createElement('button');
+            eliminarBtn.type = 'button';
+            eliminarBtn.className = 'btn-eliminar';
+            eliminarBtn.innerHTML = '<i class="fas fa-times"></i>';
+            eliminarBtn.title = 'Eliminar archivo';
+            eliminarBtn.addEventListener('click', () => eliminarArchivo(index));
+            
+            item.appendChild(icono);
+            item.appendChild(nombre);
+            item.appendChild(tamano);
+            item.appendChild(eliminarBtn);
+            lista.appendChild(item);
+        });
+        
+        contenedorArchivos.appendChild(lista);
+    }
+    
+    // Función para formatear el tamaño del archivo
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // Función para eliminar un archivo
+    function eliminarArchivo(index) {
+        archivosSeleccionados.splice(index, 1);
+        mostrarArchivosSeleccionados();
+        showNotification('Archivo eliminado', 'info');
+    }
+
+    // Manejar la selección de archivos
+    function manejarSeleccionArchivos(archivos) {
+        const archivosValidos = [];
+        
+        // Verificar límite de archivos
+        const espaciosDisponibles = MAX_ARCHIVOS - archivosSeleccionados.length;
+        if (archivos.length > espaciosDisponibles) {
+            showNotification(`Solo puedes subir ${espaciosDisponibles} archivo(s) más`, 'warning');
+            return;
+        }
+        
+        // Validar cada archivo
+        for (const archivo of archivos) {
+            if (validarArchivo(archivo)) {
+                archivosValidos.push(archivo);
+            }
+        }
+        
+        // Agregar archivos válidos
+        archivosSeleccionados = [...archivosSeleccionados, ...archivosValidos];
+        mostrarArchivosSeleccionados();
+        
+        if (archivosValidos.length > 0) {
+            showNotification(`Se agregaron ${archivosValidos.length} archivo(s)`, 'success');
+        }
+    }
+    
+    // Configurar el input de archivos
+    if (inputArchivos) {
+        inputArchivos.addEventListener('change', function (e) {
+            manejarSeleccionArchivos(Array.from(e.target.files));
+            this.value = ''; // Resetear el input para permitir volver a seleccionar el mismo archivo
+        });
+    }
+    
+    // Configurar la zona de arrastrar y soltar
+    if (dropZone) {
+        // Prevenir comportamientos por defecto
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        // Resaltar la zona de drop
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight() {
+            dropZone.classList.add('highlight');
+        }
+        
+        function unhighlight() {
+            dropZone.classList.remove('highlight');
+        }
+        
+        // Manejar archivos soltados
+        dropZone.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            manejarSeleccionArchivos(Array.from(files));
+        }
+    }
+
+    // Función para actualizar la lista visual de archivos
+    function actualizarListaArchivos() {
+        if (!contenedorArchivos) return;
+        
+        contenedorArchivos.innerHTML = '';
+        
+        if (archivosSeleccionados.length === 0) {
+            contenedorArchivos.innerHTML = '<p class="no-files">No hay archivos seleccionados</p>';
+            return;
+        }
+        
+        const lista = document.createElement('ul');
+        lista.className = 'lista-archivos';
+        
+        archivosSeleccionados.forEach((archivo, index) => {
+            const item = document.createElement('li');
+            item.className = 'archivo-item';
+            
+            const icono = document.createElement('span');
+            icono.className = 'icono-archivo';
+            icono.innerHTML = obtenerIconoPorTipo(archivo.type);
+            
+            const infoContainer = document.createElement('div');
+            infoContainer.className = 'archivo-info';
+            
+            const nombre = document.createElement('span');
+            nombre.className = 'nombre-archivo';
+            nombre.textContent = archivo.name;
+            
+            const tamano = document.createElement('span');
+            tamano.className = 'tamano-archivo';
+            tamano.textContent = formatFileSize(archivo.size);
+            
+            const eliminarBtn = document.createElement('button');
+            eliminarBtn.type = 'button';
+            eliminarBtn.className = 'btn-eliminar';
+            eliminarBtn.innerHTML = '<i class="fas fa-times"></i>';
+            eliminarBtn.title = 'Eliminar archivo';
+            eliminarBtn.addEventListener('click', () => eliminarArchivo(index));
+            
+            infoContainer.appendChild(nombre);
+            infoContainer.appendChild(tamano);
+            
+            item.appendChild(icono);
+            item.appendChild(infoContainer);
+            item.appendChild(eliminarBtn);
+            
+            lista.appendChild(item);
+        });
+        
+        contenedorArchivos.appendChild(lista);
+    }
+    
+    // Función para obtener el ícono según el tipo de archivo
+    function obtenerIconoPorTipo(tipo) {
+        if (tipo.startsWith('image/')) return '<i class="fas fa-image"></i>';
+        if (tipo === 'application/pdf') return '<i class="fas fa-file-pdf"></i>';
+        if (tipo.includes('word') || tipo.includes('document')) return '<i class="fas fa-file-word"></i>';
+        if (tipo.includes('spreadsheet') || tipo.includes('excel')) return '<i class="fas fa-file-excel"></i>';
+        if (tipo.includes('powerpoint') || tipo.includes('presentation')) return '<i class="fas fa-file-powerpoint"></i>';
+        if (tipo.includes('zip') || tipo.includes('compressed')) return '<i class="fas fa-file-archive"></i>';
+
+    if (!descripcion) {
+        showNotification('Por favor ingresa una descripción para la publicación', 'error');
+        return false;
+                        body: formDataPortada
+                    });
+
+                    if (!responsePortada.ok) {
+                        const errorText = await responsePortada.text();
+                        console.error('Error en la respuesta del servidor:', errorText);
+                        throw new Error('Error al subir la imagen de portada: ' + responsePortada.statusText);
+                    }
+
+                    const dataPortada = await responsePortada.json();
+                    console.log('Respuesta del servidor:', dataPortada);
+                    urlPortada = dataPortada.url || '';
+                } catch (error) {
+                    console.error('Error al subir la portada:', error);
+                    throw new Error('No se pudo subir la imagen de portada');
+                }
+            }
+
+            // 2. Subir archivos adjuntos si hay
+            let archivosSubidos = [];
+
+            if (archivosSeleccionados.length > 0) {
+                const formData = new FormData();
+                archivosSeleccionados.forEach(archivo => {
+                    formData.append('archivos', archivo);
+                });
+
+                try {
+                    const response = await fetch('/node/upload/publicacion', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`Error al subir archivos: ${response.status} - ${errorText}`);
+                    }
+
+                    const data = await response.json();
+                    archivosSubidos = data.archivos || [];
+                } catch (error) {
+                    console.error('Error al subir archivos:', error);
+                    throw new Error('No se pudieron subir los archivos adjuntos');
+                }
+            }
+
+            // 3. Redirigir a la página de etiquetas con los datos de la publicación
+            const params = new URLSearchParams();
+            params.append('titulo', encodeURIComponent(titulo));
+            params.append('descripcion', encodeURIComponent(descripcion));
+            if (urlPortada) {
+                params.append('imagenPortada', encodeURIComponent(urlPortada));
+            }
+            if (archivosSubidos.length > 0) {
+                params.append('archivos', encodeURIComponent(JSON.stringify(archivosSubidos)));
+            }
+
+            window.location.href = `publicarTags.html?${params.toString()}`;
+
+        } catch (error) {
+            console.error('Error al procesar la publicación:', error);
+            showNotification(`Error: ${error.message}`, 'error');
+            
+            // Restaurar el botón
+            if (siguienteBtn && originalBtnText) {
+                siguienteBtn.disabled = false;
+                siguienteBtn.textContent = originalBtnText;
+            }
+        }
+    }
+    
+    // Configurar el evento de envío del formulario
+    if (siguienteBoton) {
+        siguienteBoton.addEventListener('click', async function(e) {
+            e.preventDefault();
+            await manejarEnvioFormulario();
+        });
+    }
+});

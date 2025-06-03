@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nodejs-app
+  labels:
+    app: nodejs-app
 spec:
   replicas: 1
   selector:
@@ -14,19 +16,59 @@ spec:
     spec:
       containers:
         - name: nodejs-app
-          image: nodejs-app:latest
-          imagePullPolicy: Never
+          image: calvinhub/pfc-k8s-nodejs-app:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          env:
+            - name: MYSQL_SERVICE_HOST
+              value: "mysql"
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: username
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: password
+            - name: MYSQL_DATABASE
+              value: pfc-bbdd
+            - name: NODE_ENV
+              value: "production"
           volumeMounts:
             - name: uploads-volume
               mountPath: /app/uploads
-            - name: followers-volume
-              mountPath: /app/followers
+              subPath: uploads
+            - name: publicaciones-volume
+              mountPath: /app/public/uploads/publicaciones
+              subPath: publicaciones
       volumes:
         - name: uploads-volume
           persistentVolumeClaim:
             claimName: uploads-pvc
-        - name: followers-volume
+        - name: publicaciones-volume
           persistentVolumeClaim:
-            claimName: followers-pvc
+            claimName: publicaciones-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodejs-service
+  labels:
+    app: nodejs-app
+spec:
+  selector:
+    app: nodejs-app
+  ports:
+    - port: 3000
+      targetPort: 3000
+  type: ClusterIP
