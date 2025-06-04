@@ -287,6 +287,7 @@ main section>div {
     overflow-x: auto;
     overflow-y: hidden;
     border-radius: 20px;
+    text-align: center;
 }
 
 main section>img:hover {
@@ -304,79 +305,6 @@ main section>div {
     /* IE and Edge */
     scrollbar-width: none;
     /* Firefox */
-}
-
-/* Styles for publication feed */
-#s1 {
-    display: flex;
-    flex-wrap: wrap; /* Allow items to wrap to the next line */
-    justify-content: center; /* Center items on the line */
-    gap: 20px; /* Spacing between items */
-    padding: 20px; /* Padding around the container */
-}
-
-.objeto {
-    width: 250px; /* Fixed width for each publication item */
-    /* height: 320px; */ /* Consider a fixed height for more uniformity if content varies a lot */
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    display: flex;
-    flex-direction: column;
-    background-color: #fff;
-    transition: box-shadow 0.3s ease-in-out; /* Keep or modify transition */
-}
-
-.objeto:hover {
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* Adjusted hover effect */
-}
-
-.objeto a {
-    text-decoration: none;
-    color: inherit;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-}
-
-/* This is the div created in JS that wraps the image and title */
-.objeto a > div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px; /* Padding inside the content area of the card */
-    flex-grow: 1; /* Allows this area to grow, pushing author down */
-}
-
-.objeto img {
-    width: 100%; /* Full width of the .objeto card */
-    height: 180px; /* Fixed height for the image display area */
-    object-fit: cover; /* Cover the area, cropping as needed */
-    border-bottom: 1px solid #eee; /* Separator line */
-    /* border-radius: 8px 8px 0 0; */ /* If .objeto has rounded corners, image might not need its own top rounding if it's the first child */
-}
-
-.objeto h3 {
-    font-size: 1.1em;
-    color: #333;
-    margin: 10px 0 5px 0;
-    text-align: center;
-    width: calc(100% - 20px); /* Account for padding in the parent a > div */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; /* From original */
-    font-weight: lighter; /* From original */
-}
-
-.objeto p { /* Targets the author paragraph */
-    font-size: 0.9em;
-    color: #555;
-    padding: 0 10px 10px 10px; /* Padding for author text */
-    text-align: center;
-    margin-top: auto; /* Pushes author to the bottom */
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* From original */
 }
 
 footer {
@@ -503,6 +431,7 @@ footer section:nth-of-type(1) h1 {
     transition-duration: 0.4s;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     cursor: pointer;
+    text-align: center;
 }
 
 .logout:hover{

@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // Define logeado1 from localStorage to check login status
+    let logeado1 = localStorage.getItem("logeado");
+    console.log("Login status (logeado1):", logeado1);
+    
     const tagInput = document.getElementById('tagInput');
     const tagsContainer = document.getElementById('tagsContainer');
     const tagsPreview = document.getElementById('tagsPreview');
@@ -37,8 +41,10 @@ document.addEventListener('DOMContentLoaded', function () {
     tagInput.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' || e.key === ',') {
             e.preventDefault();
+            console.log("'Enter' key pressed on tagInput.");
             const tag = tagInput.value.trim().toLowerCase();
             if (tag && !selectedTags.includes(tag)) {
+                console.log(`Adding tag: '${tag}'`);
                 addTag(tag);
                 tagInput.value = '';
             }
@@ -90,11 +96,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Función para añadir una etiqueta
     function addTag(tag) {
+        console.log(`addTag function called with tag: '${tag}'`);
         if (!tag || selectedTags.includes(tag)) return;
 
         selectedTags.push(tag);
-        updateTagsDisplay();
-
+        console.log('Updated selectedTags array:', selectedTags);
+        
+        // Update the tags preview section
+        updatePreview();
+        
         // Crear elemento de etiqueta
         const tagElement = document.createElement('div');
         tagElement.className = 'tag-item';
@@ -132,6 +142,30 @@ document.addEventListener('DOMContentLoaded', function () {
                 el.remove();
             }
         });
+    }
+
+    // updatePreview function is already defined below
+
+    // Función para eliminar una etiqueta
+    function removeTag(tag) {
+        console.log(`Removing tag: '${tag}'`);
+        // Eliminar de la lista de etiquetas seleccionadas
+        const index = selectedTags.indexOf(tag);
+        if (index !== -1) {
+            selectedTags.splice(index, 1);
+            console.log('Updated selectedTags after removal:', selectedTags);
+        }
+        
+        // Eliminar el elemento visual
+        const tagElements = document.querySelectorAll('.tag-item');
+        tagElements.forEach(el => {
+            if (el.textContent.trim().includes(tag)) {
+                el.remove();
+            }
+        });
+        
+        // Actualizar la vista previa
+        updatePreview();
     }
 
     // Función para actualizar la vista previa
@@ -172,74 +206,86 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Manejar el botón de publicar
-    document.getElementById('publicar').addEventListener('click', async function () {
-        if (selectedTags.length === 0) {
-            alert('Por favor, añade al menos una etiqueta a tu publicación.');
-            return;
-        }
-
-        const publicarBtn = document.getElementById('publicar');
-        const originalBtnText = publicarBtn.textContent;
-
-        try {
-            // Mostrar indicador de carga
-            publicarBtn.disabled = true;
-            publicarBtn.textContent = 'Guardando tags...';
-
-            // Obtener id_publicacion de la URL
-            const publicacionData = getUrlParams();
-            const id_publicacion = publicacionData.id_publicacion;
-
-            if (!id_publicacion) {
-                alert('Error: No se encontró el ID de la publicación. Asegúrate de que la URL es correcta.');
-                throw new Error('ID de publicación no encontrado en la URL.');
+    const publicarButton = document.getElementById('publicar');
+    if (publicarButton) {
+        publicarButton.addEventListener('click', async function () {
+            console.log("'Publicar' button (id='publicar') clicked.");
+            if (selectedTags.length === 0) {
+                alert('Por favor, añade al menos una etiqueta a tu publicación.');
+                return;
             }
 
-            const payload = {
-                tags: selectedTags
-            };
-            
-            const apiUrl = `/node/publicaciones/${id_publicacion}/tags`;
-            
-            console.log('Enviando tags a:', apiUrl);
-            console.log('Payload:', JSON.stringify(payload));
-            
-            // Enviar los tags al backend
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload),
-                credentials: 'include' // Mantener si se manejan cookies/sesiones
-            });
-            
-            console.log('Respuesta del servidor:', response);
-            const result = await response.json(); // Intentar parsear JSON siempre para obtener detalles
+            const publicarBtn = document.getElementById('publicar');
+            const originalBtnText = publicarBtn.textContent;
 
-            if (!response.ok) {
-                throw new Error(result.error || result.message || `Error ${response.status} al guardar los tags`);
+            try {
+                // Mostrar indicador de carga
+                publicarBtn.disabled = true;
+                publicarBtn.textContent = 'Guardando tags...';
+
+                // Obtener id_publicacion de la URL
+                const publicacionData = getUrlParams();
+                const id_publicacion = publicacionData.id_publicacion;
+
+                if (!id_publicacion) {
+                    alert('Error: No se encontró el ID de la publicación. Asegúrate de que la URL es correcta.');
+                    throw new Error('ID de publicación no encontrado en la URL.');
+                }
+
+                const payload = {
+                    tags: selectedTags
+                };
+                
+                const apiUrl = `/node/publicaciones/${id_publicacion}/tags`;
+                
+                console.log('Enviando tags a:', apiUrl);
+                console.log('Payload:', JSON.stringify(payload));
+                
+                // Enviar los tags al backend
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload),
+                    credentials: 'include' // Mantener si se manejan cookies/sesiones
+                });
+                
+                console.log('Respuesta del servidor:', response);
+                const result = await response.json(); // Intentar parsear JSON siempre para obtener detalles
+
+                if (!response.ok) {
+                    throw new Error(result.error || result.message || `Error ${response.status} al guardar los tags`);
+                }
+
+                console.log('Tags guardados:', result);
+
+                // Mostrar mensaje de éxito y redirigir
+                alert('¡Tags añadidos con éxito a la publicación!');
+                // Considerar redirigir a la página de la publicación o a una página de confirmación
+                window.location.href = 'index.html'; // O, por ejemplo, `verPublicacion.html?id=${id_publicacion}`
+
+            } catch (error) {
+                console.error('Error al guardar los tags:', error);
+                alert(`Error al guardar los tags: ${error.message}`);
+            } finally {
+                // Restaurar el botón
+                publicarBtn.disabled = false;
+                publicarBtn.textContent = originalBtnText;
             }
+        });
+    } else {
+        console.error("Button with id 'publicar' not found for event listener.");
+    }
 
-            console.log('Tags guardados:', result);
-
-            // Mostrar mensaje de éxito y redirigir
-            alert('¡Tags añadidos con éxito a la publicación!');
-            // Considerar redirigir a la página de la publicación o a una página de confirmación
-            window.location.href = 'index.html'; // O, por ejemplo, `verPublicacion.html?id=${id_publicacion}`
-
-        } catch (error) {
-            console.error('Error al guardar los tags:', error);
-            alert(`Error al guardar los tags: ${error.message}`);
-        } finally {
-            // Restaurar el botón
-            publicarBtn.disabled = false;
-            publicarBtn.textContent = originalBtnText;
-        }
-    });
-
-    // Manejar el botón de atrás
-    document.getElementById('anterior').addEventListener('click', function () {
-        window.history.back();
-    });
+    // Manejar el botón de volver atrás
+    const volverButton = document.getElementById('anterior');
+    if (volverButton) {
+        volverButton.addEventListener('click', function() {
+            console.log("'Volver atrás' button (id='anterior') clicked.");
+            window.history.back(); // Navegar a la página anterior
+        });
+    } else {
+        console.error("Button with id 'anterior' not found.");
+    }
 });

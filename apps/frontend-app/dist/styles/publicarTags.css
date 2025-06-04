@@ -595,6 +595,7 @@ footer section:nth-of-type(1) h1 {
     transition-duration: 0.4s;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     cursor: pointer;
+    text-align: center;
 }
 
 .logout:hover{

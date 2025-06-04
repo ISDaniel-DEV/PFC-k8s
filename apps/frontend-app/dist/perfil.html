@@ -2,7 +2,9 @@
 <html lang="en">
 
 <head>
+    
     <link rel="stylesheet" href="./styles/perfil.css">
+    <link rel="stylesheet" href="./styles/publications.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Main</title>
@@ -23,8 +25,8 @@
             <div><img src="./img/lupa.svg" alt=""><input type="search" placeholder="Buscar diseños de ejemplo..."></div>
 
             <nav>
-                <img src="./img/upload.svg" alt="" id="subir">
                 <p id="logout" class="logout"></p>
+                <img src="./img/upload.svg" alt="" id="subir">
                 <img id="desplegable" class="nav1" src="./img/profile.svg" alt="" title="Mi Perfil">
             </nav>
 
@@ -53,10 +55,8 @@
         </section>
         <section>
             <h1>Publicaciones</h1>
-            <section>
-                <div></div>
-                <div></div>
-                <div></div>
+            <section id="publicaciones-container" class="publications-feed-container">
+                <!-- Las publicaciones del usuario se cargarán aquí -->
             </section>
         </section>
     </main>

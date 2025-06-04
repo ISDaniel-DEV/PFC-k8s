@@ -43,12 +43,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             objetoDiv.appendChild(linkElement);
 
             const authorP = document.createElement('p');
-            // Podríamos hacer que el nombre del autor sea un enlace a su perfil en el futuro
-            // const authorLink = document.createElement('a');
-            // authorLink.href = `perfil.html?id_autor=${pub.id_autor}`;
-            // authorLink.textContent = `#${pub.autor_nombre || 'Autor desconocido'}`;
-            // authorP.appendChild(authorLink);
-            authorP.textContent = `#${pub.autor_nombre || 'Autor desconocido'}`;
+            const authorLink = document.createElement('a');
+            authorLink.href = `perfil.html?id_usuario=${pub.id_autor}`;
+            authorLink.textContent = `#${pub.autor_nombre || 'Autor desconocido'}`;
+            authorP.appendChild(authorLink);
             objetoDiv.appendChild(authorP);
 
             // Omitimos la línea de "downloads - days ago" por ahora ya que no tenemos esos datos
