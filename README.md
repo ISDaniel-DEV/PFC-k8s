@@ -9,3 +9,6 @@ It is composed of:
 The frontend is HTML, CSS and Javascript.
 
 All deployed with Kubernetes.
+
+This is the link to the deployed page.
+https://desigbay.es/
