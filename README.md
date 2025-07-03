@@ -10,5 +10,5 @@ The frontend is HTML, CSS and Javascript.
 
 All deployed with Kubernetes.
 
-This is the link to the deployed page.
+This is the link to the deployed web page
 https://desigbay.es/
